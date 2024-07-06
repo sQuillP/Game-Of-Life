@@ -1,0 +1,72 @@
+.home {
+    background-color: var(--dark-1);
+    padding-top: 10vh;
+    height: 90vh;
+
+}
+
+.content {
+    max-width: 500px;
+    height: 50vh;
+    margin: 0 auto;
+    background-color: var(--dark-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 30px 0;
+}
+
+
+.icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid black;
+    width: 50%;
+    padding-top: 10px;
+}
+
+
+.body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.home-button {
+    cursor: pointer;
+    padding: 10px 20px;
+    margin: 10px 0;
+    min-width:200px;
+    font-size: 1.5rem;
+}
+
+.title {
+    text-align: center;
+    color: white;
+}
+
+.h-icon {
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 50%;
+    background: var(--dark-5);
+    padding: 10;
+    height: 30px;
+    width:30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    color: white;
+    border: none;
+    outline: none;
+}
+.home-subtitle {
+    font-size: 1.75rem;
+}
+.home-title {
+    font-size: 3.5rem;
+}
