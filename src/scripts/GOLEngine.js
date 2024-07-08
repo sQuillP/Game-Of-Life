@@ -1,4 +1,15 @@
+/**
+ * Accept a configuration object that will determine what the GOLEngine will be doing.
+ * 
+ * Instances: Button (for home) will render an instance of GOL.
+ */
 
+
+
+
+/**
+ * NOTE: We should remove any stray points that are not being shown in the graph.
+ */
 
 /**
  * @description Attach instance to a canvas object and plug in config
@@ -8,7 +19,9 @@ export default class GOLEngine {
 
 
     constructor(canvas, height=100, width=100, magnification=10) {
-        this.liveCells = new Set(['1,1']);
+        console.log('constructor called');
+        //Instance variables.
+        this.liveCells = new Set();
         this.deadCells = new Set();
         this.canvas = canvas;
         this.pen = canvas.getContext("2d");
@@ -16,38 +29,76 @@ export default class GOLEngine {
         this.canvas.height = height;
         this.magnification = magnification;
         this.TICK_SPEED = 1000;
-        console.log("CANVAS FROM ENGINE", canvas)
+
+        // Bind the listener methods to the instance
+        // this.scrollWheelListener = this.scrollWheelListener.bind(this);
+        // this.clickPointListener = this.clickPointListener.bind(this);
+
+        //Mount listeners?
+        this.mountListeners();
 
 
-        this.canvas.onwheel = e => {
-            const delta = Math.sign(e.deltaY);
-            this.magnification += delta * 0.1;
-            this.drawGrid(this.magnification);
-        }
-    
-    
+    }
+
+    // constructor(config) {
+
+    // }
+
+
+
+
+
+    /**
+     * @description CLEANUP: This must be called before component/canvas goes out of scope.
+     * Prevent memory leaks with event listeners.
+     */
+    unmount() {
+        console.log("unmounting");
+        this.canvas.removeEventListener('click',this.clickPointListener,true);
+        this.canvas.removeEventListener('wheel', this.scrollWheelListener, true);
+    }
+
+    mountListeners() {
+        // Manage zoom when user is 
         //Add live cell to coordinate map and all adjacent dead cells.
-        this.canvas.addEventListener('click',(e)=> {
-            console.log('clicked');
-            //Generally the grid does not start at 0,0 in the view window.
-            const scale = e.target.getBoundingClientRect();
-            console.log("SCALE", scale)
-            const [x,y] =[ this.mapCoordinate(e.clientX-scale.x), this.mapCoordinate(e.clientY - scale.y)]
-            const liveCellPoint = `${x},${y}`;
-            if(this.liveCells.has(liveCellPoint) === true) {
-                this.deleteLiveCell(liveCellPoint);
-            } else {
-                this.insertLiveCell(liveCellPoint);
-            }
-            console.log(x,y);
-            this.drawGrid(this.magnification);
-        });
+        this.canvas.addEventListener('click',this.clickPointListener);
+        this.canvas.addEventListener('wheel', this.scrollWheelListener)
+    }
 
+
+    
+
+    //pass in x or y coordinate
+    mapCoordinate(n) {
+        const cellSize = 100/this.magnification;
+        const location = Math.floor((n/cellSize));
+        return location
+    }
+
+    clickPointListener = (e)=> {
+        //Generally the grid does not start at 0,0 in the view window.
+        console.log('click point listener');
+        const scale = e.target.getBoundingClientRect();
+        const [x,y] =[ this.mapCoordinate(e.clientX-scale.x), this.mapCoordinate(e.clientY - scale.y)]
+        const liveCellPoint = `${x},${y}`;
+        if(this.liveCells.has(liveCellPoint) === true) {
+            this.deleteLiveCell(liveCellPoint);
+        } else {
+            this.insertLiveCell(liveCellPoint);
+        }
+        this.drawGrid(this.magnification);
+    }
+
+
+    scrollWheelListener = (e)=> {
+        console.log('listening to scroll')
+        const delta = Math.sign(e.deltaY);
+        this.magnification += delta * 0.1;
+        this.drawGrid(this.magnification);
     }
     
 
     run() {
-        console.log('running');
         this.drawGrid(10)
     }
 
@@ -78,26 +129,19 @@ export default class GOLEngine {
             this.pen.fill();
             this.pen.stroke();
         }
-        console.log(this.liveCells);
-        //for debugging. These are the dead cells.
     }
 
     
     //Cast a point string<"x,y"> to an array([x,y]) 
     pointToInt = (pointString)=> pointString.split(',').map(x=> parseInt(x,10));
 
-    //pass in x or y coordinate
-    mapCoordinate(n) {
-        const cellSize = 100/this.magnification;
-        const location = Math.floor((n/cellSize));
-        return location
-    }
+    
 
-
-    //This will take a performance hit if used.
-    //For every live cell, there is at least 8 neighboring cells
-    //residing in memory. Essentially, this slows everything down by
-    // 8x
+    
+    /**
+     * @description shows cell 
+     * @param {number} cellSize 
+     */
     showDeadCells(cellSize) {
         for(const pointString of this.deadCells) {
             let [x,y] = this.pointToInt(pointString);
@@ -142,6 +186,7 @@ export default class GOLEngine {
         }
     }
 
+
     //use this function to delete a currently alive cell.
     deleteLiveCell(liveCellPoint) {
         let newDeadCells = new Set();
@@ -159,6 +204,10 @@ export default class GOLEngine {
     }
 
 
+    /**
+     * @description perform the next iteration/stage for the simulation.
+     * For each call to tick(), the next generation will be rendered.
+     */
     tick() {
         const newlyLiveCells = new Set();
         const newlyDeadCells = new Set();
