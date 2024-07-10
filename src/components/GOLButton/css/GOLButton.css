@@ -1,0 +1,11 @@
+.GOLButton {
+    background: white;
+    margin: 10px 0;
+    cursor: pointer;   
+    transition: background 100ms linear;
+}
+
+
+.GOLButton:hover {
+    background-color: lightgray;
+}

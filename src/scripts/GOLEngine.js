@@ -1,87 +1,54 @@
 /**
- * Accept a configuration object that will determine what the GOLEngine will be doing.
- * 
- * Instances: Button (for home) will render an instance of GOL.
+ * @description Logic controller for handling Game oF Life simulation.
+ * For UI purposes, you can customize the output of the engine. This must get plugged
+ * into a canvas instance.
  */
 
 
 
-
-/**
- * NOTE: We should remove any stray points that are not being shown in the graph.
- */
-
-/**
- * @description Attach instance to a canvas object and plug in config
- * to render a specific type of Game of Life playthrough.
- */
 export default class GOLEngine {
-
-
-    constructor(canvas, height=100, width=100, magnification=10) {
-        console.log('constructor called');
-        //Instance variables.
+    constructor(canvas,{height, editable, width, magnification, data, grid, enableZoom}) {
+        // Instance variables.
         this.liveCells = new Set();
         this.deadCells = new Set();
         this.canvas = canvas;
         this.pen = canvas.getContext("2d");
-        this.canvas.width = width;
+        this.canvas.width = width
         this.canvas.height = height;
         this.magnification = magnification;
-        this.TICK_SPEED = 1000;
-
-        // Bind the listener methods to the instance
-        // this.scrollWheelListener = this.scrollWheelListener.bind(this);
-        // this.clickPointListener = this.clickPointListener.bind(this);
-
-        //Mount listeners?
-        this.mountListeners();
-
-
-    }
-
-    // constructor(config) {
-
-    // }
-
-
-
-
-
-    /**
-     * @description CLEANUP: This must be called before component/canvas goes out of scope.
-     * Prevent memory leaks with event listeners.
-     */
-    unmount() {
-        console.log("unmounting");
-        this.canvas.removeEventListener('click',this.clickPointListener,true);
-        this.canvas.removeEventListener('wheel', this.scrollWheelListener, true);
-    }
-
-    mountListeners() {
-        // Manage zoom when user is 
-        //Add live cell to coordinate map and all adjacent dead cells.
-        this.canvas.addEventListener('click',this.clickPointListener);
-        this.canvas.addEventListener('wheel', this.scrollWheelListener)
+        this.TICK_SPEED = 100;
+        this.showGrid = grid;
+        this.enableZoom = enableZoom;
+        this.initialCells = data;
+        this.editable = editable;
+        this.initializeCells();
     }
 
 
-    
-
-    //pass in x or y coordinate
     mapCoordinate(n) {
-        const cellSize = 100/this.magnification;
-        const location = Math.floor((n/cellSize));
-        return location
+        const cellSize = 100 / this.magnification;
+        const location = Math.floor(n / cellSize);
+        return location;
     }
 
-    clickPointListener = (e)=> {
-        //Generally the grid does not start at 0,0 in the view window.
-        console.log('click point listener');
-        const scale = e.target.getBoundingClientRect();
-        const [x,y] =[ this.mapCoordinate(e.clientX-scale.x), this.mapCoordinate(e.clientY - scale.y)]
+
+    initializeCells() {
+        //clear all live cells
+        this.liveCells = new Set();
+        this.deadCells = new Set();
+
+        for(const liveCell of this.initialCells) {
+            this.insertLiveCell(liveCell);
+        }
+        this.drawGrid();
+    }
+
+    handleClick(e) {
+        if(this.editable === false) return;
+        const scale = this.canvas.getBoundingClientRect();
+        const [x, y] = [this.mapCoordinate(e.clientX - scale.x), this.mapCoordinate(e.clientY - scale.y)];
         const liveCellPoint = `${x},${y}`;
-        if(this.liveCells.has(liveCellPoint) === true) {
+        if (this.liveCells.has(liveCellPoint)) {
             this.deleteLiveCell(liveCellPoint);
         } else {
             this.insertLiveCell(liveCellPoint);
@@ -89,67 +56,40 @@ export default class GOLEngine {
         this.drawGrid(this.magnification);
     }
 
-
-    scrollWheelListener = (e)=> {
-        console.log('listening to scroll')
+    handleScroll(e) {
+        if(this.enableZoom === false) return;
+        console.log('listening to scroll');
         const delta = Math.sign(e.deltaY);
         this.magnification += delta * 0.1;
         this.drawGrid(this.magnification);
     }
-    
 
     run() {
-        this.drawGrid(10)
+        this.drawGrid();
     }
 
-
-    drawGrid(magnification){
+    drawGrid() {
         this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        const cellSize = 100 / magnification;
+        const cellSize = 100 / this.magnification;
         this.pen.beginPath();
-        for(let x = 0; x < this.canvas.width; x += cellSize){
-            this.pen.moveTo(x, 0);
-            this.pen.lineTo(x, this.canvas.height);
+        if(this.showGrid === true) {
+            for (let x = 0; x < this.canvas.width; x += cellSize) {
+                this.pen.moveTo(x, 0);
+                this.pen.lineTo(x, this.canvas.height);
+            }
+            for (let y = 0; y < this.canvas.height; y += cellSize) {
+                this.pen.moveTo(0, y);
+                this.pen.lineTo(this.canvas.width, y);
+            }
+            this.pen.stroke();
         }
-        for(let y = 0; y < this.canvas.height; y += cellSize){
-            this.pen.moveTo(0, y);
-            this.pen.lineTo(this.canvas.width, y);
-        }
-        this.pen.stroke();
-        for(const pointString of this.liveCells) {
-            let [x,y] = this.pointToInt(pointString);
+        for (const pointString of this.liveCells) {
+            let [x, y] = this.pointToInt(pointString);
             this.pen.beginPath();
             this.pen.fillStyle = 'black';
             this.pen.rect(
-                x*cellSize,
-                y*cellSize, 
-                cellSize,
-                cellSize
-            )
-            this.pen.fill();
-            this.pen.stroke();
-        }
-    }
-
-    
-    //Cast a point string<"x,y"> to an array([x,y]) 
-    pointToInt = (pointString)=> pointString.split(',').map(x=> parseInt(x,10));
-
-    
-
-    
-    /**
-     * @description shows cell 
-     * @param {number} cellSize 
-     */
-    showDeadCells(cellSize) {
-        for(const pointString of this.deadCells) {
-            let [x,y] = this.pointToInt(pointString);
-            this.pen.beginPath();
-            this.pen.fillStyle = 'red';
-            this.pen.rect(
-                x*cellSize,
-                y*cellSize,
+                x * cellSize,
+                y * cellSize,
                 cellSize,
                 cellSize
             );
@@ -158,44 +98,59 @@ export default class GOLEngine {
         }
     }
 
-    /*Return all adjacent points for a specific coordinate*/
-    getAdjacentPoints(x,y) {
+    pointToInt(pointString) {
+        return pointString.split(',').map(x => parseInt(x, 10));
+    }
+
+    showDeadCells(cellSize) {
+        for (const pointString of this.deadCells) {
+            let [x, y] = this.pointToInt(pointString);
+            this.pen.beginPath();
+            this.pen.fillStyle = 'red';
+            this.pen.rect(
+                x * cellSize,
+                y * cellSize,
+                cellSize,
+                cellSize
+            );
+            this.pen.fill();
+            this.pen.stroke();
+        }
+    }
+
+    getAdjacentPoints(x, y) {
         return [
-            `${x+1},${y+1}`,
-            `${x+1},${y}`,
-            `${x+1},${y-1}`,
-            `${x},${y+1}`,
-            `${x},${y-1}`,
-            `${x-1},${y}`,
-            `${x-1},${y+1}`,
-            `${x-1},${y-1}`
+            `${x + 1},${y + 1}`,
+            `${x + 1},${y}`,
+            `${x + 1},${y - 1}`,
+            `${x},${y + 1}`,
+            `${x},${y - 1}`,
+            `${x - 1},${y}`,
+            `${x - 1},${y + 1}`,
+            `${x - 1},${y - 1}`
         ];
     }
 
-
-    //Use this function to add a new cell to the grid.
     insertLiveCell(liveCellPoint) {
         this.liveCells.add(liveCellPoint);
         this.deadCells.delete(liveCellPoint);
-        const [x,y] = this.pointToInt(liveCellPoint);
-        const adjacentPoints = this.getAdjacentPoints(x,y);
-        for(let i = 0; i<adjacentPoints.length; i++) {
-            if(this.liveCells.has(adjacentPoints[i]) === false) {
+        const [x, y] = this.pointToInt(liveCellPoint);
+        const adjacentPoints = this.getAdjacentPoints(x, y);
+        for (let i = 0; i < adjacentPoints.length; i++) {
+            if (!this.liveCells.has(adjacentPoints[i])) {
                 this.deadCells.add(adjacentPoints[i]);
             }
         }
     }
 
-
-    //use this function to delete a currently alive cell.
     deleteLiveCell(liveCellPoint) {
         let newDeadCells = new Set();
-        this.liveCells.delete(liveCellPoint)
-        for(const liveCell of this.liveCells) {
-            const [x,y] = this.pointToInt(liveCell);
-            const adjacentPoints = this.getAdjacentPoints(x,y);
-            for(let i = 0; i<adjacentPoints.length; i++) {
-                if(this.liveCells.has(adjacentPoints[i]) === false) {
+        this.liveCells.delete(liveCellPoint);
+        for (const liveCell of this.liveCells) {
+            const [x, y] = this.pointToInt(liveCell);
+            const adjacentPoints = this.getAdjacentPoints(x, y);
+            for (let i = 0; i < adjacentPoints.length; i++) {
+                if (!this.liveCells.has(adjacentPoints[i])) {
                     newDeadCells.add(adjacentPoints[i]);
                 }
             }
@@ -203,46 +158,42 @@ export default class GOLEngine {
         this.deadCells = newDeadCells;
     }
 
-
-    /**
-     * @description perform the next iteration/stage for the simulation.
-     * For each call to tick(), the next generation will be rendered.
-     */
     tick() {
         const newlyLiveCells = new Set();
         const newlyDeadCells = new Set();
-        for(const deadCellString of this.deadCells) {
-            const [x,y] = this.pointToInt(this.deadCellString);
-            const neighbors = this.getAdjacentPoints(x,y);
-            let liveNeighborCount = 0
-            for(let i = 0; i< neighbors.length; i++) {
-                if(this.liveCells.has(neighbors[i])) {
-                    liveNeighborCount += 1
+        for (const deadCellString of this.deadCells) {
+            const [x, y] = this.pointToInt(deadCellString);
+            const neighbors = this.getAdjacentPoints(x, y);
+            let liveNeighborCount = 0;
+            for (let i = 0; i < neighbors.length; i++) {
+                if (this.liveCells.has(neighbors[i])) {
+                    liveNeighborCount += 1;
                 }
             }
-            if(liveNeighborCount === 3) {
-                newlyLiveCells.add(this.deadCellString);
+            if (liveNeighborCount === 3) {
+                newlyLiveCells.add(deadCellString);
             }
         }
-        for(const liveCellString of this.liveCells) {
-            const [x,y] = this.pointToInt(liveCellString);
-            const adjacentPoints = this.getAdjacentPoints(x,y);
+        for (const liveCellString of this.liveCells) {
+            const [x, y] = this.pointToInt(liveCellString);
+            const adjacentPoints = this.getAdjacentPoints(x, y);
             let adjacentCounter = 0;
-            for(let i = 0; i<adjacentPoints.length; i++) {
-                if(this.liveCells.has(adjacentPoints[i])) {
+            for (let i = 0; i < adjacentPoints.length; i++) {
+                if (this.liveCells.has(adjacentPoints[i])) {
                     adjacentCounter += 1;
                 }
             }
-            if(adjacentCounter !== 2 && adjacentCounter !== 3) {
+            if (adjacentCounter !== 2 && adjacentCounter !== 3) {
                 newlyDeadCells.add(liveCellString);
             }
         }
-        for(const discardedCell of newlyDeadCells) {
+        for (const discardedCell of newlyDeadCells) {
             this.deleteLiveCell(discardedCell);
         }
-        for(const newCell of newlyLiveCells) {
+        for (const newCell of newlyLiveCells) {
             this.insertLiveCell(newCell);
         }
-        this.drawGrid(this.magnification);
+        this.drawGrid();
     }
 }
+

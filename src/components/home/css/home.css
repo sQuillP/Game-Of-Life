@@ -22,7 +22,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-top: 1px solid black;
+    border-top: 2px solid black;
     width: 50%;
     padding-top: 10px;
 }
@@ -54,8 +54,8 @@
     border-radius: 50%;
     background: var(--dark-5);
     padding: 10;
-    height: 30px;
-    width:30px;
+    height: 40px;
+    width:40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,7 +63,17 @@
     color: white;
     border: none;
     outline: none;
+    border: 1px solid lightgray;
 }
+
+.h-icon > * {
+    font-size: 1.25rem;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+
 .home-subtitle {
     font-size: 1.75rem;
 }

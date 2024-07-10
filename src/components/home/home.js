@@ -1,3 +1,4 @@
+import { PLAY, WIKI } from "../configs/GOLButton.config";
 import GOLButton from "../GOLButton/GOLButton";
 import "./css/home.css";
 
@@ -14,17 +15,18 @@ export default function Home() {
                     <p className="home-title text">Game Of Life</p>
                 </div>
                 <div className="body">
-                    <button className="home-button silkscreen-regular">Play</button>
-                    <button className="home-button silkscreen-regular">Wiki</button>
+                    {/* <button className="home-button silkscreen-regular">Play</button> */}
+                    {/* <button className="home-button silkscreen-regular">Wiki</button> */}
+                    <GOLButton config={PLAY}/>
+                    <GOLButton config={WIKI}/>
                 </div>
                 <div className="icons">
                     <button onClick={()=>window.open(githubRepo)} className="h-icon">
                         <i className="fa-brands fa-github"></i>
                     </button>
-                    <GOLButton/>
-                    <button onClick={()=>window.open(wiki)} className="h-icon">
+                    {/* <button onClick={()=>window.open(wiki)} className="h-icon">
                         <i className="fa-brands fa-wikipedia-w"></i>
-                    </button>
+                    </button> */}
                 </div>
             </div>
         </div>
