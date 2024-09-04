@@ -1,22 +1,22 @@
 /**
  * @description Logic controller for handling Game oF Life simulation.
  * For UI purposes, you can customize the output of the engine. This must get plugged
- * into a canvas instance.
+ * into a canvas HTML Element.
  */
 
 
 
 export default class GOLEngine {
-    constructor(canvas,{height, editable, width, magnification, data, grid, enableZoom}) {
+    constructor(canvas,{height, TICK_SPEED, editable, width, magnification, data, grid, enableZoom}) {
         // Instance variables.
         this.liveCells = new Set();
         this.deadCells = new Set();
         this.canvas = canvas;
         this.pen = canvas.getContext("2d");
-        this.canvas.width = width
+        this.canvas.width = width;
         this.canvas.height = height;
         this.magnification = magnification;
-        this.TICK_SPEED = 100;
+        this.TICK_SPEED = TICK_SPEED;
         this.showGrid = grid;
         this.enableZoom = enableZoom;
         this.initialCells = data;
