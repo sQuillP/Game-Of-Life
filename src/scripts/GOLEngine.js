@@ -64,6 +64,16 @@ export default class GOLEngine {
         this.drawGrid(this.magnification);
     }
 
+
+    setDimensions(height = -1, width = -1) {
+        if(height != -1) {
+            this.canvas.height = height;
+        }
+        if(width != -1) {
+            this.canvas.width = width;
+        }
+    }
+
     run() {
         this.drawGrid();
     }

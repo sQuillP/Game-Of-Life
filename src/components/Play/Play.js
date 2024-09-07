@@ -18,6 +18,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 import FolderIcon from '@mui/icons-material/Folder';
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import { MuiColorInput } from "mui-color-input";
+import { Link } from "react-router-dom";
 
 /*
 
@@ -55,8 +56,12 @@ export default function Play() {
     const [zoom, setZoom] = useState(10);
     const [initialData, setInitialData] = useState([]);
     const [cellColor, setCellColor] = useState("#000000");
+    const [generation, setGeneration] = useState(0);
 
 
+    function updateGeneration() {
+        setGeneration(generation + 1);
+    }
 
     
     function handleSelectChange() {
@@ -67,6 +72,11 @@ export default function Play() {
         <div className="play-main">
             {/* add header */}
             <div className="play-header">
+                <Link style={{textDecoration:'none'}} to={'/home'}>
+                    <h2 className="play-title silkscreen-regular">
+                        Game of Life
+                    </h2>
+                </Link>
                 <Stack direction={'row'} gap={3} justifyContent={'center'} alignItems={'center'}>
                     <Tooltip title={playState === true ? "Play (space)":"Pause (space)"}>
                         <IconButton
@@ -117,8 +127,12 @@ export default function Play() {
                         size="small"
                     />
                 </Stack>
+                <div></div>
             </div>
-            <GOLPlayer playState={playState}/>
+            <GOLPlayer 
+                playState={playState}
+                updateGeneration={updateGeneration}
+            />
         </div>
     );
 }
