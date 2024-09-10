@@ -21,8 +21,6 @@ export default function Home() {
                     <p className="home-title text">Game Of Life</p>
                 </div>
                 <div className="body">
-                    {/* <button className="home-button silkscreen-regular">Play</button> */}
-                    {/* <button className="home-button silkscreen-regular">Wiki</button> */}
                     <GOLButton onClick={()=> navigation("/play")} config={PLAY}/>
                     <GOLButton onClick={()=> window.open(wiki)} config={WIKI}/>
                 </div>
@@ -32,11 +30,14 @@ export default function Home() {
                             <i className="fa-brands fa-github"></i>
                         </button>
                     </Tooltip>
-                    {/* <button onClick={()=>window.open(wiki)} className="h-icon">
-                        <i className="fa-brands fa-wikipedia-w"></i>
-                    </button> */}
+                    
                 </div>
             </div>
         </div>
+        
     )
 }
+
+{/* <button onClick={()=>window.open(wiki)} className="h-icon">
+                        <i className="fa-brands fa-wikipedia-w"></i>
+                    </button> */}

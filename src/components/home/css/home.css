@@ -1,13 +1,11 @@
 .home {
     background-color: var(--dark-1);
-    padding-top: 10vh;
-    height: 90vh;
-
+    /* height: 100vh; */
 }
 
 .content {
     max-width: 500px;
-    height: 50vh;
+    height: 500px;
     margin: 0 auto;
     background-color: var(--dark-2);
     display: flex;

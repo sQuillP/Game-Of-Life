@@ -13,10 +13,19 @@ export default function GOLPlayer({playState=false, tickSpeed=100, updateGenerat
     const playInterval = useRef(null);
     const canvasContainer = useRef(null);
     
+  
 
+    const mousedownHandler = useCallback( (event) => {
+        GOLRef.current.setClick(true);
+        GOLRef.current.placePoint(event);
+    },[]);
 
-    const clickHandler = useCallback((event)=> {
-        GOLRef.current.handleClick(event);
+    const mouseupHandler = useCallback((_)=> {
+        GOLRef.current.setClick(false);
+    },[]);
+
+    const mousemoveHandler = useCallback((event)=> {
+        GOLRef.current.placePoint(event);
     },[]);
 
     const wheelListener = useCallback((event)=> {
@@ -24,14 +33,8 @@ export default function GOLPlayer({playState=false, tickSpeed=100, updateGenerat
     },[]);
 
 
+    //Auto-adjust the screen so that grid takes up the desired space.
     const resizeListener = useCallback(resizeScreen,[]);
-
-    function cleanup() {
-        canvas.current.removeEventListener('click',clickHandler);
-        canvas.current.removeEventListener('wheel',wheelListener);
-        canvas.current.removeEventListener('click', clickHandler);
-        window.removeEventListener('resize', resizeListener);
-    }
 
 
     function resizeScreen() {
@@ -43,28 +46,53 @@ export default function GOLPlayer({playState=false, tickSpeed=100, updateGenerat
 
 
     /* Listen for changes in the parent with configuration options. */
-    useEffect(()=> {
-        if(playState === false) {
-            clearInterval(playInterval.current);
-        } else {
-            clearInterval(playInterval.current);
-            playInterval.current = setInterval(()=>{
-                GOLRef.current.tick();
-                updateGeneration();
-            }, tickSpeed);
-        }
-    },[playState,tickSpeed, updateGeneration]);
+    // useEffect(()=> {
+    //     if(playState === false) {
+    //         clearInterval(playInterval.current);
+    //     } else {
+    //         clearInterval(playInterval.current);
+    //         playInterval.current = setInterval(()=>{
+    //             GOLRef.current.tick();
+    //             updateGeneration();
+    //         }, tickSpeed);
+    //     }
+    // },[playState,tickSpeed, updateGeneration]);
 
 
     useEffect(()=> {
         GOLRef.current = new GOLEngine(canvas.current, MAIN_PLAY_CONFIG);
-        canvas.current.addEventListener('click',clickHandler);
+        // canvas.current.style.backgroundColor='green';
+        //Mount listeners for grid events
+
         canvas.current.addEventListener('wheel',wheelListener);
         window.addEventListener('resize', resizeListener);
+        canvas.current.addEventListener('mousedown', mousedownHandler);
+        canvas.current.addEventListener('mouseup', mouseupHandler);
+        canvas.current.addEventListener('mousemove', mousemoveHandler);
+
+
         GOLRef.current.initializeCells();
         resizeScreen();
-        return cleanup;
-    },[clickHandler, wheelListener]);
+
+        //Cleanup event listeners for grid events.
+        return ()=> {
+
+            window.removeEventListener('resize', resizeListener);
+            if(canvas.current) {
+                canvas.current.removeEventListener('wheel',wheelListener);
+                canvas.current.removeEventListener('mousedown', mousedownHandler);
+                canvas.current.removeEventListener('mouseup', mouseupHandler);
+                canvas.current.removeEventListener('mousemove', mousemoveHandler);
+            }
+        }
+
+    },[
+        resizeListener, 
+        mousedownHandler, 
+        mouseupHandler, 
+        mousemoveHandler, 
+        wheelListener
+    ]);
 
 
     /* Any more useEffects for reacting to data changes from the parent. */

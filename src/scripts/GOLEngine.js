@@ -21,6 +21,10 @@ export default class GOLEngine {
         this.enableZoom = enableZoom;
         this.initialCells = data;
         this.editable = editable;
+
+        this.clicked = false;
+
+        
         this.initializeCells();
     }
 
@@ -43,8 +47,8 @@ export default class GOLEngine {
         this.drawGrid();
     }
 
-    handleClick(e) {
-        if(this.editable === false) return;
+    placePoint(e) {
+        if(this.editable === false || this.clicked === false) return;
         const scale = this.canvas.getBoundingClientRect();
         const [x, y] = [this.mapCoordinate(e.clientX - scale.x), this.mapCoordinate(e.clientY - scale.y)];
         const liveCellPoint = `${x},${y}`;
@@ -62,6 +66,11 @@ export default class GOLEngine {
         const delta = Math.sign(e.deltaY);
         this.magnification += delta * 0.1;
         this.drawGrid(this.magnification);
+    }
+
+
+    setClick(clicked) {
+        this.clicked = clicked;
     }
 
 
@@ -112,6 +121,8 @@ export default class GOLEngine {
         return pointString.split(',').map(x => parseInt(x, 10));
     }
 
+
+    //This comes at a large performance cost. Don't use this lol.
     showDeadCells(cellSize) {
         for (const pointString of this.deadCells) {
             let [x, y] = this.pointToInt(pointString);
