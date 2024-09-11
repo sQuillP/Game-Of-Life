@@ -13,8 +13,6 @@ export default function GOLPlayer({playState=false, tickSpeed=100, updateGenerat
     const playInterval = useRef(null);
     const canvasContainer = useRef(null);
     
-  
-
     const mousedownHandler = useCallback( (event) => {
         GOLRef.current.setClick(true);
         GOLRef.current.placePoint(event);

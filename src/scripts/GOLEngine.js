@@ -1,13 +1,10 @@
 /**
  * @description Logic controller for handling Game oF Life simulation.
- * For UI purposes, you can customize the output of the engine. This must get plugged
- * into a canvas HTML Element.
+ * For UI purposes, you can customize the output of the engine. Attach the engine instance
+ * to a canvas and you're all set.
  */
-
-
-
 export default class GOLEngine {
-    constructor(canvas,{height, TICK_SPEED, editable, width, magnification, data, grid, enableZoom}) {
+    constructor(canvas,{height, TICK_SPEED, editable, width, magnification, data, grid, enableZoom, enableDeadCells=false}) {
         // Instance variables.
         this.liveCells = new Set();
         this.deadCells = new Set();
@@ -21,11 +18,19 @@ export default class GOLEngine {
         this.enableZoom = enableZoom;
         this.initialCells = data;
         this.editable = editable;
-
+        this.enableDeadCells = enableDeadCells
         this.clicked = false;
 
-        
+        //Declare constants
+        this.MAX_ZOOM = 15.0;
+        this.MIN_ZOOM = 1.0;
+
         this.initializeCells();
+    }
+
+
+    updateConfiguration(configuration) {
+        
     }
 
 
@@ -52,9 +57,7 @@ export default class GOLEngine {
         const scale = this.canvas.getBoundingClientRect();
         const [x, y] = [this.mapCoordinate(e.clientX - scale.x), this.mapCoordinate(e.clientY - scale.y)];
         const liveCellPoint = `${x},${y}`;
-        if (this.liveCells.has(liveCellPoint)) {
-            this.deleteLiveCell(liveCellPoint);
-        } else {
+        if(this.liveCells.has(liveCellPoint) === false){
             this.insertLiveCell(liveCellPoint);
         }
         this.drawGrid(this.magnification);
@@ -62,9 +65,21 @@ export default class GOLEngine {
 
     handleScroll(e) {
         if(this.enableZoom === false) return;
-        console.log('listening to scroll');
+
         const delta = Math.sign(e.deltaY);
-        this.magnification += delta * 0.1;
+
+        //updated magnification.
+        const newMagnification = (delta*0.1)+this.magnification;
+
+        //Disable scrolling when user reaches their maximum or minimum zoom level.
+        if(newMagnification > this.MAX_ZOOM || newMagnification < this.MIN_ZOOM) {
+            return;
+        }
+
+        //Otherwise set the scroll magnification to the newly adjusted value.
+        this.magnification = newMagnification
+
+        //re-render the grid.
         this.drawGrid(this.magnification);
     }
 
@@ -73,6 +88,11 @@ export default class GOLEngine {
         this.clicked = clicked;
     }
 
+
+    clearCells() {
+        this.liveCells = new Set();
+        this.deadCells = new Set();
+    }
 
     setDimensions(height = -1, width = -1) {
         if(height != -1) {
@@ -102,6 +122,8 @@ export default class GOLEngine {
             }
             this.pen.stroke();
         }
+
+        // Render each live cell to the screen
         for (const pointString of this.liveCells) {
             let [x, y] = this.pointToInt(pointString);
             this.pen.beginPath();
@@ -158,18 +180,26 @@ export default class GOLEngine {
         const [x, y] = this.pointToInt(liveCellPoint);
         const adjacentPoints = this.getAdjacentPoints(x, y);
         for (let i = 0; i < adjacentPoints.length; i++) {
+            // If neighboring cell is not alive, add it to the dead frontier.
             if (!this.liveCells.has(adjacentPoints[i])) {
                 this.deadCells.add(adjacentPoints[i]);
             }
         }
     }
 
+
+    //NOTE: This method should definitely be optimized. Redrawing the dead cell frontier is a costly 
+    //way to manage dead cells. O(C+N)*O(set operation)
+    // I tried already and wasted too much time.
     deleteLiveCell(liveCellPoint) {
         let newDeadCells = new Set();
         this.liveCells.delete(liveCellPoint);
+
         for (const liveCell of this.liveCells) {
             const [x, y] = this.pointToInt(liveCell);
             const adjacentPoints = this.getAdjacentPoints(x, y);
+
+            // after getting adjacent points, we check if any adjacent point is a live cell
             for (let i = 0; i < adjacentPoints.length; i++) {
                 if (!this.liveCells.has(adjacentPoints[i])) {
                     newDeadCells.add(adjacentPoints[i]);
@@ -182,6 +212,7 @@ export default class GOLEngine {
     tick() {
         const newlyLiveCells = new Set();
         const newlyDeadCells = new Set();
+
         for (const deadCellString of this.deadCells) {
             const [x, y] = this.pointToInt(deadCellString);
             const neighbors = this.getAdjacentPoints(x, y);

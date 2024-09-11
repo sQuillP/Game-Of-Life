@@ -1,24 +1,16 @@
 import "./css/Play.css";
-
-import GOLPlayer from "../GOLPlayer/GOLPlayer";
 import { useState } from "react";
-import { 
-    Button, 
-    IconButton, 
-    MenuItem, 
-    Select, 
-    Stack, 
-    Tooltip,
-    FormControl,
-    InputLabel,
-    Input,
-} from "@mui/material";
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import FolderIcon from '@mui/icons-material/Folder';
-import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import useMediaQuery from "@mui/material/useMediaQuery";
+import GOLPlayer from "../GOLPlayer/GOLPlayer";
+import { Button, Select, MenuItem, Stack } from "@mui/material";
 import { MuiColorInput } from "mui-color-input";
 import { Link } from "react-router-dom";
+import FolderIcon from "@mui/icons-material/Folder";
+import PlayButton from "./components/PlayButton";
+import BookmarksIcon from "@mui/icons-material/Bookmarks";
+import Draggable from "react-draggable";
+
+
 
 /*
 
@@ -58,6 +50,9 @@ export default function Play() {
     const [cellColor, setCellColor] = useState("#000000");
     const [generation, setGeneration] = useState(0);
 
+    const smallscreen = useMediaQuery('(max-width: 1000px)');
+
+
 
     function updateGeneration() {
         setGeneration(generation + 1);
@@ -69,70 +64,93 @@ export default function Play() {
     }
 
     return (
-        <div className="play-main">
-            {/* add header */}
-            <div className="play-header">
-                <Link style={{textDecoration:'none'}} to={'/home'}>
-                    <h2 className="play-title silkscreen-regular">
-                        Game of Life
-                    </h2>
-                </Link>
-                <Stack direction={'row'} gap={3} justifyContent={'center'} alignItems={'center'}>
-                    <Tooltip title={playState === true ? "Play (space)":"Pause (space)"}>
-                        <IconButton
-                            size="large"
-                            style={{background:'#1ed760'}}
-                            onClick={()=> setPlayState(!playState)}
-                        >
-                            {
-                                playState === true ? (
-                                    <PlayArrowIcon sx={{color:'black', fontSize: '1.5rem'}}/>
-                                ): (
-                                    <PauseIcon sx={{color:'black', fontSize: '1.5rem'}}/>
-                                )
-                            }
-                        </IconButton>
-                    </Tooltip>
-                    <Button
-                        size="medium"
-                        variant='contained'
-                        sx={buttonSX}
-                        endIcon={<BookmarksIcon/>}
-                    >
-                        Save
-                    </Button>
-                    <Button
-                        size="medium"
-                        variant='contained'
-                        sx={buttonSX}
-                        endIcon={<FolderIcon fontSize="small"/>}
-                    >
-                        Load
-                    </Button>
-                    <Select
-                        size="small"
-                        value={"None"}
-                        onChange={handleSelectChange}
-                        variant="outlined"
-                        sx={{background:'lightgray'}}
+        <>
 
-                    >
-                        <MenuItem hidden value='None'>Presets</MenuItem>
-                    </Select>
-                    <MuiColorInput
-                        format="hex"
-                        value={cellColor}
-                        onChange={setCellColor}
-                        sx={{background:'lightgray'}}
-                        size="small"
-                    />
-                </Stack>
-                <div></div>
-            </div>
-            <GOLPlayer 
+            {(()=> {
+                if(smallscreen === false) {
+                    return (
+                        <div className="play-header">
+                            <Link style={{textDecoration:'none'}} to={'/home'}>
+                                <h2 className="play-title silkscreen-regular">
+                                    Game of Life
+                                </h2>
+                            </Link>
+                            <Stack direction={'row'} gap={3} justifyContent={'center'} alignItems={'center'}>
+                            <PlayButton
+                                playState={playState}
+                                setPlayState={setPlayState}
+                            />
+                                <Button
+                                    size="medium"
+                                    variant='contained'
+                                    sx={buttonSX}
+                                    endIcon={<BookmarksIcon/>}
+                                >
+                                    Save
+                                </Button>
+                                <Button
+                                    size="medium"
+                                    variant='contained'
+                                    sx={buttonSX}
+                                    endIcon={<FolderIcon fontSize="small"/>}
+                                >
+                                    Load
+                                </Button>
+                                <Select
+                                    size="small"
+                                    value={"None"}
+                                    onChange={handleSelectChange}
+                                    variant="outlined"
+                                    sx={{background:'lightgray'}}
+
+                                >
+                                    <MenuItem hidden value='None'>Presets</MenuItem>
+                                </Select>
+                                <MuiColorInput
+                                    format="hex"
+                                    value={cellColor}
+                                    onChange={setCellColor}
+                                    sx={{background:'lightgray'}}
+                                    size="small"
+                                />
+                            </Stack>
+                            <div></div>
+                        </div>
+                    )
+                } else {
+                    return (
+                        <>
+                            <div className="smallscreen-header">
+                                <Link style={{textDecoration:'none'}} to={'/home'}>
+                                    <h2 className="play-title silkscreen-regular">
+                                        Game of Life
+                                    </h2>
+                                </Link>
+                            </div>
+                            <div className="smallscreen-footer">
+
+                                <PlayButton
+                                    playState={playState}
+                                    setPlayState={setPlayState}
+                                />
+                            </div>
+                        </>
+                    )
+                }
+            })()}
+            <Draggable
+            >
+                <div className="drag-container">
+                    <p>Generation:  2321</p>
+                    <p>live cells: </p>
+                </div>
+            </Draggable>
+
+            <GOLPlayer
                 playState={playState}
                 updateGeneration={updateGeneration}
             />
-        </div>
+       </>
+
     );
 }

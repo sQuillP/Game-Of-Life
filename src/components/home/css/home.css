@@ -1,6 +1,8 @@
 .home {
     background-color: var(--dark-1);
-    /* height: 100vh; */
+    height: 100vh;
+    padding-top: 10vh;
+    box-sizing: border-box;
 }
 
 .content {

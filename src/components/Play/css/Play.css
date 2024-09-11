@@ -1,18 +1,50 @@
 
 .play-header {
     background: var(--dark-2);
-    height: 10vh;
     display: flex;
     align-items: center;
+    height: 10vh;
     justify-content: space-around;
+    z-index: 200;
 }
 
-.play-main {
-    height: 90vh;
-}
 
 
 .play-title {
     font-size: 2.5rem;
     color: lightgray;
+    padding: 0;
+    margin: 0;
+}
+
+
+.smallscreen-header {
+    height: 10vh;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark-2);
+}
+
+
+.smallscreen-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 6vh;
+    width: 100%;;
+    background: var(--dark-2);
+}
+
+.drag-container {
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 10px;;
+    color: white;
+    width: 200px;
+    height: 100px;
+    padding: 10px;
+    position: absolute;
+    font-family: sans-serif;
+    border: 3px solid black;
 }

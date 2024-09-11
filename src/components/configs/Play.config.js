@@ -15,5 +15,6 @@ export const MAIN_PLAY_CONFIG = Object.freeze({
     enableZoom: true,
     editable: true,
     grid: true,
+    enableDeadCells: false,
     data:[]
 });
