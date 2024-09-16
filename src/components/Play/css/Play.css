@@ -48,3 +48,16 @@
     font-family: sans-serif;
     border: 3px solid black;
 }
+
+
+.generation-txt {
+    font-size: 1.5rem;
+    color: lightgray;
+}
+
+
+@media screen and (max-width: 500px) {
+    .play-title, .generation-txt {
+        font-size: 1.5rem;
+    }
+}

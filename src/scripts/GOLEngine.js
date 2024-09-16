@@ -1,3 +1,7 @@
+const RIGHT_CLICK = 3;
+const LEFT_CLICK = 1;
+
+
 /**
  * @description Logic controller for handling Game oF Life simulation.
  * For UI purposes, you can customize the output of the engine. Attach the engine instance
@@ -20,6 +24,7 @@ export default class GOLEngine {
         this.editable = editable;
         this.enableDeadCells = enableDeadCells
         this.clicked = false;
+        this.mouseButton = LEFT_CLICK;
 
         //Declare constants
         this.MAX_ZOOM = 15.0;
@@ -57,7 +62,11 @@ export default class GOLEngine {
         const scale = this.canvas.getBoundingClientRect();
         const [x, y] = [this.mapCoordinate(e.clientX - scale.x), this.mapCoordinate(e.clientY - scale.y)];
         const liveCellPoint = `${x},${y}`;
-        if(this.liveCells.has(liveCellPoint) === false){
+        if(this.mouseButton === RIGHT_CLICK && this.liveCells.has(liveCellPoint) === true) {
+            console.log('should delete live cell')
+            this.deleteLiveCell(liveCellPoint)
+        }
+        else if(this.liveCells.has(liveCellPoint) === false && this.mouseButton === LEFT_CLICK){
             this.insertLiveCell(liveCellPoint);
         }
         this.drawGrid(this.magnification);
@@ -84,16 +93,22 @@ export default class GOLEngine {
     }
 
 
-    setClick(clicked) {
+    // Sets the edit mode to true and the mouse button to eitehr
+    setClick(clicked, mouseButton) {
         this.clicked = clicked;
+        this.mouseButton = mouseButton;
     }
 
 
+    // Removes all live and dead cells in the object.
     clearCells() {
         this.liveCells = new Set();
         this.deadCells = new Set();
     }
 
+
+    //Set a new height and width of the canvas.
+    // use -1 to keep current dimension.
     setDimensions(height = -1, width = -1) {
         if(height != -1) {
             this.canvas.height = height;
@@ -103,10 +118,12 @@ export default class GOLEngine {
         }
     }
 
-    run() {
-        this.drawGrid();
-    }
 
+
+    /**
+     * @description iterate over each point and draw it to the grid.
+     * These points are stored in the liveCells set data structure.
+     */
     drawGrid() {
         this.pen.clearRect(0, 0, this.canvas.width, this.canvas.height);
         const cellSize = 100 / this.magnification;
@@ -139,12 +156,14 @@ export default class GOLEngine {
         }
     }
 
+    // Return a pont string "x,y" into an int[] = [x,y]
     pointToInt(pointString) {
         return pointString.split(',').map(x => parseInt(x, 10));
     }
 
 
     //This comes at a large performance cost. Don't use this lol.
+    //Draw all the dead cells (the frontier) that surrounds each live cell.
     showDeadCells(cellSize) {
         for (const pointString of this.deadCells) {
             let [x, y] = this.pointToInt(pointString);
@@ -161,6 +180,9 @@ export default class GOLEngine {
         }
     }
 
+
+    // Return a list of points that are adjacent by exactly
+    // 1 unit in all 8 directions
     getAdjacentPoints(x, y) {
         return [
             `${x + 1},${y + 1}`,
@@ -174,6 +196,8 @@ export default class GOLEngine {
         ];
     }
 
+    // Adds a new live cell to the game. adds the respective
+    //neighboring "dead" cells.
     insertLiveCell(liveCellPoint) {
         this.liveCells.add(liveCellPoint);
         this.deadCells.delete(liveCellPoint);
@@ -209,6 +233,9 @@ export default class GOLEngine {
         this.deadCells = newDeadCells;
     }
 
+
+    // Upon calling, run a single frame of simulation for the
+    // Game of life
     tick() {
         const newlyLiveCells = new Set();
         const newlyDeadCells = new Set();

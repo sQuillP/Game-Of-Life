@@ -121,30 +121,50 @@ export default function Play() {
                     return (
                         <>
                             <div className="smallscreen-header">
-                                <Link style={{textDecoration:'none'}} to={'/home'}>
-                                    <h2 className="play-title silkscreen-regular">
-                                        Game of Life
-                                    </h2>
-                                </Link>
+                                <Stack
+                                    direction={'row'}
+                                    justifyContent={'space-around'}
+                                    alignItems={'center'}
+                                    width={'100%'}
+                                >
+                                    
+                                    <Link style={{textDecoration:'none'}} to={'/home'}>
+                                        <h2 className="play-title silkscreen-regular">
+                                            Game of Life
+                                        </h2>
+                                    </Link>
+                                    <div>
+                                        <p className="text generation-txt silkscreen-regular">GEN: 890</p>
+                                    </div>
+                                </Stack>
                             </div>
                             <div className="smallscreen-footer">
+                                <Stack 
+                                    direction={'column'} 
+                                    justifyContent={'center'} 
+                                    alignItems={'center'}
+                                    height={'100%'}
+                                >
+                                    
+                                    <PlayButton
+                                        playState={playState}
+                                        setPlayState={setPlayState}
+                                    />
 
-                                <PlayButton
-                                    playState={playState}
-                                    setPlayState={setPlayState}
-                                />
+
+                                </Stack>
                             </div>
                         </>
                     )
                 }
             })()}
-            <Draggable
+            {/* <Draggable
             >
                 <div className="drag-container">
                     <p>Generation:  2321</p>
                     <p>live cells: </p>
                 </div>
-            </Draggable>
+            </Draggable> */}
 
             <GOLPlayer
                 playState={playState}
