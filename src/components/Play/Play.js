@@ -69,13 +69,6 @@ export default function Play() {
     }
 
     
-    function handleSelectChange() {
-
-    }
-
-    function onSaveLayout() {
-        
-    }
 
     function onResetGame() {
         setResetGame(!resetGame);
@@ -84,7 +77,7 @@ export default function Play() {
 
 
     //Cancel the current play state and toggle the modal
-    function onToggleModal() {
+    function onToggleSaveModal() {
         setOpenModal(openModal => !openModal);
 
         setPlayState(false);
@@ -94,6 +87,10 @@ export default function Play() {
         setLoadGameDialog(loadGameDialog => !loadGameDialog);
     }
 
+
+    function onCloseLoadGameDialog() {
+        setLoadGameDialog(false);
+    }
 
 
     return (
@@ -118,7 +115,7 @@ export default function Play() {
                                     variant='contained'
                                     sx={buttonSX}
                                     endIcon={<BookmarksIcon/>}
-                                    onClick={onToggleModal}
+                                    onClick={onToggleSaveModal}
                                 >
                                     Save
                                 </Button>
@@ -219,9 +216,12 @@ export default function Play() {
                 updateGeneration={updateGeneration}
                 cellColor={cellColor}
                 resetGame={resetGame}
-                openModal={openModal}
-                onCloseModal={onToggleModal}
+
+                openSaveModal={openModal}
                 loadGameDialog={loadGameDialog}
+
+                onCloseSaveModal={onToggleSaveModal}
+                onCloseLoadGameDialog={onCloseLoadGameDialog}
             />
        </>
 

@@ -5,53 +5,70 @@ import {
     DialogContent,
     DialogActions,
     TextField,
-    Button
+    Button,
+    RadioGroup,
+    Radio,
+    FormControlLabel,
+
  } from "@mui/material"
 
 
  import { STORAGE_PREFIX_KEY } from "../../../util/dataTransform";
+import { useState } from "react";
 
 
+ /**
+  * @description read from localstorage to fetch all the valid games
+  * @param {*} param0 
+  * @returns 
+  */
 
 export default function LoadGameDialog({
     open,
     onClose,
-
+    setLoadedGame,
 }) {
+
+
+
+    const gameData = Object.keys(localStorage).filter(k=>k.startsWith(STORAGE_PREFIX_KEY));
+    
+
+    const [selectedLevel, setSelectedLevel] = useState("");
 
     const buttonSX = {
         textTransform:'unset'
     }
 
-    const keys = Object.keys(localStorage);
 
+    function handleOk() {
+
+    }
     
 
     return (
         <Dialog
             sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
             maxWidth="xs"
-            TransitionProps={{ onEntering: handleEntering }}
             open={open}
-            {...other}
+            onClose={onClose}
         >
-            <DialogTitle>Phone Ringtone</DialogTitle>
+            <DialogTitle>Saved Games</DialogTitle>
             <DialogContent dividers>
             <RadioGroup
-                ref={radioGroupRef}
                 aria-label="ringtone"
                 name="ringtone"
-                value={value}
-                onChange={handleChange}
+                value={selectedLevel}
+                onChange={(e)=>setSelectedLevel(e.target.value)}
             >
                 {
-                    keys.filter(storageKey=> storageKey.startsWith(STORAGE_PREFIX_KEY)).map(storageItem=> {
+                    gameData.map(storageKey=> {
                         return (
                             <FormControlLabel
-                                value={storageItem}
-                                key={storageItem}
+                                value={storageKey}
+                                key={storageKey}
                                 control={<Radio />}
-                                label={storageItem.substring(STORAGE_PREFIX_KEY.length)}
+                                label={storageKey.substring(STORAGE_PREFIX_KEY.length)}
                             />
                         )
                     })
@@ -59,10 +76,10 @@ export default function LoadGameDialog({
             </RadioGroup>
             </DialogContent>
             <DialogActions>
-            <Button autoFocus onClick={handleCancel}>
-                Cancel
-            </Button>
-            <Button onClick={handleOk}>Ok</Button>
+                <Button autoFocus onClick={onClose}>
+                    Cancel
+                </Button>
+                <Button onClick={handleOk}>Ok</Button>
             </DialogActions>
       </Dialog>
     )

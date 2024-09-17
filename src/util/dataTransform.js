@@ -23,6 +23,8 @@ export function saveLayout(name, {liveCells, deadCells}, overwrite=false) {
     console.log(liveCellsList);
     console.log(liveCells);
 
+    //append storage prefix key with the name.
+    name = STORAGE_PREFIX_KEY + name;
     let t_name = name;
     let counter = 0;
     if(overwrite === false) {

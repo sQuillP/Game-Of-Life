@@ -37,9 +37,10 @@ export default function GOLPlayer({
     updateGeneration,
     cellColor,
     resetGame,
-    openModal,
-    onCloseModal,
-    loadGameDialog
+    openSaveModal,
+    onCloseSaveModal,
+    loadGameDialog,
+    onCloseLoadGameDialog
 }) {
 
     const canvas = useRef(null);
@@ -70,7 +71,7 @@ export default function GOLPlayer({
             true
         );
         setOpenSnackbar(true);
-        onCloseModal();
+        onCloseSaveModal();
     }
     
 
@@ -118,6 +119,10 @@ export default function GOLPlayer({
     }
 
 
+    function setLoadedGame(game) {
+        GOLRef.current.loadGame(game);
+    }
+
     /* Listen for changes in the parent with configuration options. */
     useEffect(()=> {
         if(playState === false) {
@@ -150,7 +155,7 @@ export default function GOLPlayer({
 
     useEffect(()=> {
         if(!GOLRef.current) return;
-    },[openModal]);
+    },[openSaveModal]);
 
 
     useEffect(()=> {
@@ -205,13 +210,14 @@ export default function GOLPlayer({
             <SaveDialog
                 error={saveGameError}
                 onChange={(e)=>setSaveGameTitle(e.target.value)}
-                onClose={onCloseModal}
-                open={openModal}
+                onSave={onSaveGameData}
+                onClose={onCloseSaveModal}
+                open={openSaveModal}
             />
             <LoadGameDialog
                open={loadGameDialog}
-               onChange={setLoadedGame}
-               onClose={onClose}
+               setLoadedGame={setLoadedGame}
+               onClose={onCloseLoadGameDialog}
             />
             <Snackbar
                 open={openSnackbar}
