@@ -17,6 +17,10 @@ import {
 
 } from "@mui/material";
 
+
+import SaveDialog from "./components/SaveDialog";
+import LoadGameDialog from "./components/LoadGameDialog";
+
 const RIGHT_CLICK = 3;
 const LEFT_CLICK = 1;
 
@@ -34,7 +38,8 @@ export default function GOLPlayer({
     cellColor,
     resetGame,
     openModal,
-    onCloseModal
+    onCloseModal,
+    loadGameDialog
 }) {
 
     const canvas = useRef(null);
@@ -197,35 +202,17 @@ export default function GOLPlayer({
 
     return (
         <>
-            <Dialog
-                open={openModal}
+            <SaveDialog
+                error={saveGameError}
+                onChange={(e)=>setSaveGameTitle(e.target.value)}
                 onClose={onCloseModal}
-            >
-                <DialogTitle>Save Game</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Please provide a name. Any saved game that has the same name will be overwritten.
-                    </DialogContentText>
-                    <TextField
-                        sx={{color:'black'}}
-                        autoFocus
-                        required
-                        autoComplete="off"
-                        margin="dense"
-                        id="name"
-                        name="name"
-                        label={saveGameError ? "Invalid Name":"Name"}
-                        fullWidth
-                        variant="standard"
-                        onChange={e => setSaveGameTitle(e.target.value)}
-                        error={saveGameError}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button color="error" sx={buttonSX} onClick={onCloseModal}>Cancel</Button>
-                    <Button variant="contained" color="success" sx={buttonSX} onClick={onSaveGameData}>Save game</Button>
-                </DialogActions>
-            </Dialog>
+                open={openModal}
+            />
+            <LoadGameDialog
+               open={loadGameDialog}
+               onChange={setLoadedGame}
+               onClose={onClose}
+            />
             <Snackbar
                 open={openSnackbar}
                 onClose={()=> setOpenSnackbar(false)}

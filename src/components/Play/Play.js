@@ -79,6 +79,7 @@ export default function Play() {
 
     function onResetGame() {
         setResetGame(!resetGame);
+        setGeneration(0);
     }
 
 
@@ -167,7 +168,9 @@ export default function Play() {
                                     size="small"
                                 />
                             </Stack>
-                            {/* <div></div> */}
+                            <div style={{width: '150px'}}>
+                                <p style={{fontSize:'1.5rem', color:'lightgray'}} className="text silkscreen-regular">GEN: {generation}</p>
+                            </div>
                         </div>
                     )
                 } else {
@@ -187,7 +190,7 @@ export default function Play() {
                                         </h2>
                                     </Link>
                                     <div>
-                                        <p className="text generation-txt silkscreen-regular">GEN: {generation}</p>
+                                        <p  className="text generation-txt silkscreen-regular">GEN: {generation}</p>
                                     </div>
                                 </Stack>
                             </div>

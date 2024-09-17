@@ -1,5 +1,7 @@
 
 
+export const STORAGE_PREFIX_KEY="GOLSAVED-"
+
 /**
  * @description Extract the live and dead cells from a GOL game.
  * The data will be saved to local storage. It will eventually reach a 
