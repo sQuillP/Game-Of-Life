@@ -8,6 +8,9 @@ const LEFT_CLICK = 1;
  * to a canvas and you're all set.
  */
 export default class GOLEngine {
+
+    #cellColor = 'black';
+
     constructor(canvas,{height, TICK_SPEED, editable, width, magnification, data, grid, enableZoom, enableDeadCells=false}) {
         // Instance variables.
         this.liveCells = new Set();
@@ -25,6 +28,7 @@ export default class GOLEngine {
         this.enableDeadCells = enableDeadCells
         this.clicked = false;
         this.mouseButton = LEFT_CLICK;
+        this.#cellColor = 'black';
 
         //Declare constants
         this.MAX_ZOOM = 15.0;
@@ -38,11 +42,34 @@ export default class GOLEngine {
         
     }
 
+    getCells() {
+        return {
+            liveCells: new Set(this.liveCells),
+            deadCells: new Set(this.deadCells)
+        };
+    }
+
+    setCellColor(color) {
+        this.#cellColor = color;
+    }
 
     mapCoordinate(n) {
         const cellSize = 100 / this.magnification;
         const location = Math.floor(n / cellSize);
         return location;
+    }
+
+
+    //Read from a text file and it's contents.
+    readFile(fileContents) {
+
+    }
+
+
+    loadGame({liveCells, deadCells}) {
+        this.liveCells = liveCells;
+        this.deadCells = deadCells;
+        this.drawGrid();
     }
 
 
@@ -144,7 +171,7 @@ export default class GOLEngine {
         for (const pointString of this.liveCells) {
             let [x, y] = this.pointToInt(pointString);
             this.pen.beginPath();
-            this.pen.fillStyle = 'black';
+            this.pen.fillStyle = this.#cellColor;
             this.pen.rect(
                 x * cellSize,
                 y * cellSize,

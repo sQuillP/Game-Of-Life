@@ -2,14 +2,15 @@ import "./css/Play.css";
 import { useState } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import GOLPlayer from "../GOLPlayer/GOLPlayer";
-import { Button, Select, MenuItem, Stack } from "@mui/material";
+import { Button, Select, MenuItem, Stack, IconButton, Tooltip, Modal } from "@mui/material";
 import { MuiColorInput } from "mui-color-input";
 import { Link } from "react-router-dom";
 import FolderIcon from "@mui/icons-material/Folder";
 import PlayButton from "./components/PlayButton";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import Draggable from "react-draggable";
-
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { FileDownload } from "@mui/icons-material";
 
 
 /*
@@ -50,18 +51,49 @@ export default function Play() {
     const [cellColor, setCellColor] = useState("#000000");
     const [generation, setGeneration] = useState(0);
 
+    const [loadGameDialog, setLoadGameDialog] = useState(false);
+
+
+    // If changed, game data will be erased
+    const [resetGame, setResetGame]= useState(false);
+
+    //Trigger modal to open in the child component (GOLPlayer)
+    const [openModal, setOpenModal] = useState(false);
+
     const smallscreen = useMediaQuery('(max-width: 1000px)');
 
 
 
     function updateGeneration() {
-        setGeneration(generation + 1);
+        setGeneration((generation)=> generation + 1);
     }
 
     
     function handleSelectChange() {
 
     }
+
+    function onSaveLayout() {
+        
+    }
+
+    function onResetGame() {
+        setResetGame(!resetGame);
+    }
+
+
+    //Cancel the current play state and toggle the modal
+    function onToggleModal() {
+        setOpenModal(openModal => !openModal);
+
+        setPlayState(false);
+    }
+
+    function onToggleLoadGameModal() {
+        setLoadGameDialog(loadGameDialog => !loadGameDialog);
+    }
+
+
 
     return (
         <>
@@ -75,28 +107,39 @@ export default function Play() {
                                     Game of Life
                                 </h2>
                             </Link>
-                            <Stack direction={'row'} gap={3} justifyContent={'center'} alignItems={'center'}>
-                            <PlayButton
-                                playState={playState}
-                                setPlayState={setPlayState}
-                            />
+                            <Stack direction={'row'} gap={2} justifyContent={'end'} alignItems={'center'}>
+                                <PlayButton
+                                    playState={playState}
+                                    setPlayState={setPlayState}
+                                />
                                 <Button
                                     size="medium"
                                     variant='contained'
                                     sx={buttonSX}
                                     endIcon={<BookmarksIcon/>}
+                                    onClick={onToggleModal}
                                 >
                                     Save
                                 </Button>
-                                <Button
+                                <Tooltip title="Reset game">
+                                    <IconButton
+                                        size="small"
+                                        onClick={onResetGame}
+                                        style={{background: 'lightgray', color:'black'}}
+
+                                    >
+                                        <RestartAltIcon/>
+                                    </IconButton>
+                                </Tooltip>
+                                {/* <Button
                                     size="medium"
                                     variant='contained'
                                     sx={buttonSX}
                                     endIcon={<FolderIcon fontSize="small"/>}
                                 >
                                     Load
-                                </Button>
-                                <Select
+                                </Button> */}
+                                {/* <Select
                                     size="small"
                                     value={"None"}
                                     onChange={handleSelectChange}
@@ -105,7 +148,17 @@ export default function Play() {
 
                                 >
                                     <MenuItem hidden value='None'>Presets</MenuItem>
-                                </Select>
+                                </Select> */}
+                                <Button
+                                    endIcon={<FileDownload/>}
+                                    size="medium"
+                                    variant="contained"
+                                    sx={buttonSX}
+                                    onClick={onToggleLoadGameModal}
+                                >
+                                    Load
+                                </Button>
+
                                 <MuiColorInput
                                     format="hex"
                                     value={cellColor}
@@ -114,7 +167,7 @@ export default function Play() {
                                     size="small"
                                 />
                             </Stack>
-                            <div></div>
+                            {/* <div></div> */}
                         </div>
                     )
                 } else {
@@ -134,7 +187,7 @@ export default function Play() {
                                         </h2>
                                     </Link>
                                     <div>
-                                        <p className="text generation-txt silkscreen-regular">GEN: 890</p>
+                                        <p className="text generation-txt silkscreen-regular">GEN: {generation}</p>
                                     </div>
                                 </Stack>
                             </div>
@@ -158,17 +211,14 @@ export default function Play() {
                     )
                 }
             })()}
-            {/* <Draggable
-            >
-                <div className="drag-container">
-                    <p>Generation:  2321</p>
-                    <p>live cells: </p>
-                </div>
-            </Draggable> */}
-
             <GOLPlayer
                 playState={playState}
                 updateGeneration={updateGeneration}
+                cellColor={cellColor}
+                resetGame={resetGame}
+                openModal={openModal}
+                onCloseModal={onToggleModal}
+                loadGameDialog={loadGameDialog}
             />
        </>
 

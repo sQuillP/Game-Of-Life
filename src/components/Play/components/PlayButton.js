@@ -18,7 +18,7 @@ export default function PlayButton({
                 onClick={()=> setPlayState(!playState)}
             >
                 {
-                    playState === true ? (
+                    playState === false ? (
                         <PlayArrowIcon sx={{color:'black', fontSize: '1.5rem'}}/>
                     ): (
                         <PauseIcon sx={{color:'black', fontSize: '1.5rem'}}/>
