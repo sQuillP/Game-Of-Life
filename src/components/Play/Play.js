@@ -156,20 +156,21 @@ export default function Play() {
                                 >
                                     Load
                                 </Button>
-
-                                <MuiColorInput
-                                    format="hex"
-                                    value={cellColor}
-                                    onChange={setCellColor}
-                                    sx={{background:'lightgray'}}
-                                    size="small"
-                                />
+                                <Tooltip title="Choose color">
+                                    <MuiColorInput
+                                        format="hex"
+                                        value={cellColor}
+                                        onChange={setCellColor}
+                                        sx={{background:'lightgray'}}
+                                        size="small"
+                                    />
+                                </Tooltip>
                             </Stack>
                             <div style={{width: '150px'}}>
                                 <p style={{fontSize:'1.5rem', color:'lightgray'}} className="text silkscreen-regular">GEN: {generation}</p>
                             </div>
                         </div>
-                    )
+                    );
                 } else {
                     return (
                         <>
