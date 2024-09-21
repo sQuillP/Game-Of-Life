@@ -30,6 +30,7 @@ import GameList from "./GameList";
 import { styled } from '@mui/material/styles';
 
 
+
 const Root = styled('div')(({ theme }) => ({
     width: '100%',
     ...theme.typography.body2,
@@ -114,12 +115,28 @@ export default function LoadGameDialog({
     }
 
     function handleOk() {
+        // If we know that we have celltextdata populated, then we will be loading that
+        //and taking priority over other selections.
         if(cellTextData !== null) {
             console.log('uploading a file', cellTextData);
             setLoadedGame(cellTextData, false)
         } else {
-            const savedGame = loadSavedGame(STORAGE_PREFIX_KEY + selectedLevel);
-            setLoadedGame(savedGame, true);
+
+            // If we don't find any selected key from localstorage, that means
+            //that game data is coming from the presets tab
+            if(localStorage.getItem(STORAGE_PREFIX_KEY + selectedLevel) === null){
+                for(const key of Object.keys(GamePresets)) {
+                    if(GamePresets[key].title === selectedLevel) {
+                        setLoadedGame(GamePresets[key].data, false);
+                        break;
+                    }
+                }
+            } else {
+                // just load saved game.
+                const savedGame = loadSavedGame(STORAGE_PREFIX_KEY + selectedLevel);
+                setLoadedGame(savedGame, true);
+            }
+            
         }
         onClose();
     }
@@ -154,6 +171,10 @@ export default function LoadGameDialog({
         reader.readAsText(e.target.files[0]);
      } 
 
+    
+     function loadPresetData() {
+        return Object.keys(GamePresets).map(key => GamePresets[key].title);
+     }
 
 
     return (
@@ -211,7 +232,7 @@ export default function LoadGameDialog({
                                 else if(tab === 1) {
                                     return (
                                         <GameList
-                                            gameData={DUMMY_DATA}
+                                            gameData={loadPresetData()}
                                             enableDelete={false}
                                             selectedLevel={selectedLevel}
                                             listType={'preset'}

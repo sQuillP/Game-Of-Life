@@ -8,7 +8,7 @@ import {
     Button
  } from "@mui/material"
 
-
+import "../css/SaveDialog.css";
 
 
 export default function SaveDialog({
@@ -36,20 +36,21 @@ export default function SaveDialog({
                     <DialogContentText paddingTop={'20px'} color={'white'}>
                         Please provide a name.
                     </DialogContentText>
-                    <TextField
-                        sx={{color:'black'}}
+                    <input
                         autoFocus
                         required
                         autoComplete="off"
                         margin="dense"
                         id="name"
                         name="name"
+                        className="save-input"
                         label={error ? "Invalid Name":"Name"}
                         fullWidth
                         variant="standard"
                         onChange={onChange}
                         error={error}
                         value={value}
+                        style={{background:'var(--dark-6)'}}
                     />
                 </DialogContent>
                 <DialogActions sx={{background:'var(--dark-4)'}}>

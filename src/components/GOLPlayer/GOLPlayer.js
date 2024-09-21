@@ -79,6 +79,7 @@ export default function GOLPlayer({
             true
         );
         setOpenSnackbar(true);
+        setSaveGameTitle('');
         onCloseSaveModal();
     }
     
