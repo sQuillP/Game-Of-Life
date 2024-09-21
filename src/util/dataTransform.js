@@ -1,5 +1,6 @@
 
 
+// Prefixed storage key to separate anything else that would be saved to localstorage.
 export const STORAGE_PREFIX_KEY="GOLSAVED-"
 
 /**
@@ -19,9 +20,6 @@ export function saveLayout(name, {liveCells, deadCells}, overwrite=false) {
     for(const deadCell of deadCells) {
         deadCellsList.push(deadCell);
     }
-
-    console.log(liveCellsList);
-    console.log(liveCells);
 
     //append storage prefix key with the name.
     name = STORAGE_PREFIX_KEY + name;
@@ -62,4 +60,20 @@ export function loadSavedGame(name) {
     savedGame.deadCells = new Set(parsedGameString.deadCells);
 
     return savedGame;
+}
+
+
+/**
+ * @description Take a generic coordinate grouping of cells and shift them
+ * xoffset and yoffset
+ * @param {*} cells 
+ * @param {*} xoffset 
+ * @param {*} yoffset 
+ * @returns 
+ */
+export const shiftCells = (cells,xoffset, yoffset)=> {
+    return cells.map(x=> {
+        const [x1,y1] = x.split(",").map(v => parseInt(v,10));//Help scale the points without modifying things.
+        return `${x1+xoffset},${y1 + yoffset}`
+    })
 }

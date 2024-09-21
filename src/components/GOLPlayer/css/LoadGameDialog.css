@@ -1,0 +1,17 @@
+.lgd-empty-games {
+    font-size: 1.5rem;
+    color: lightgray;
+    font-weight: rgb(99, 99, 99);
+}
+
+
+.lgd-file-upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.lgd-custom-container {
+    min-height: 250px;
+}
