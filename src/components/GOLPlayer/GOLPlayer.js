@@ -58,6 +58,14 @@ export default function GOLPlayer({
     }
 
 
+    function onUpdateSaveTitle(e) {
+        const updatedTitle = e.target.value;
+        if(updatedTitle.length > 10) {
+            return;
+        }
+        setSaveGameTitle(updatedTitle);
+    }
+
     //When user let's the game get saved.
     function onSaveGameData() {
         if(saveGameTitle.trim() === "") {
@@ -94,7 +102,17 @@ export default function GOLPlayer({
     },[]);
 
     const wheelListener = useCallback((event)=> {
+        console.log('wheel', event.deltaY)
         GOLRef.current.drawGrid(GOLRef.current.handleScroll(event));
+    },[]);
+
+
+    const pinchListener = useCallback(e=> {
+        if (e.scale < 1.0) {
+            // User moved fingers closer together
+        } else if (e.scale > 1.0) {
+            // User moved fingers further apart
+        }
     },[]);
 
 
@@ -119,8 +137,16 @@ export default function GOLPlayer({
     }
 
 
-    function setLoadedGame(game) {
-        GOLRef.current.loadGame(game);
+    function setLoadedGame(game, savedGame=true) {
+        if(savedGame === true) {
+            GOLRef.current.loadGame(game);
+            GOLRef.current.drawGrid();
+        } else {
+            console.log(game)
+            GOLRef.current.setInitialCells(game);
+            GOLRef.current.initializeCells();
+
+        }
     }
 
     /* Listen for changes in the parent with configuration options. */
@@ -172,6 +198,7 @@ export default function GOLPlayer({
         canvas.current.addEventListener('mousedown', mousedownHandler);
         canvas.current.addEventListener('mouseup', mouseupHandler);
         canvas.current.addEventListener('mousemove', mousemoveHandler);
+        canvas.current.addEventListener('gestureend', pinchListener);
 
         //Create the cells and amke sure tha tthe screen is resized appropriately.
         GOLRef.current.initializeCells();
@@ -190,6 +217,7 @@ export default function GOLPlayer({
                 canvas.current.removeEventListener('mousedown', mousedownHandler);
                 canvas.current.removeEventListener('mouseup', mouseupHandler);
                 canvas.current.removeEventListener('mousemove', mousemoveHandler);
+                canvas.current.removeEventListener('gestureend',pinchListener);
             }
         }
 
@@ -209,7 +237,8 @@ export default function GOLPlayer({
         <>
             <SaveDialog
                 error={saveGameError}
-                onChange={(e)=>setSaveGameTitle(e.target.value)}
+                onChange={onUpdateSaveTitle}
+                value={saveGameTitle}
                 onSave={onSaveGameData}
                 onClose={onCloseSaveModal}
                 open={openSaveModal}

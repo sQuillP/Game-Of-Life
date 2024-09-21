@@ -30,14 +30,14 @@ export default function GameList({
                             className="gl-list-item"
                             style={{
                                 padding:"5px 15px",
-                                background:selectedLevel === levelName ? '#f5f2f2':'white',
+                                background:selectedLevel === levelName ? 'var(--dark-4)':'var(--dark-3)',
                                 cursor:'pointer',
                                 fontFamily:"sans-serif",
                                 display:'flex',
                                 justifyContent:'space-between',
                                 alignItems:'center',
                                 borderTop:'1px solid lightgray',
-                                borderBottom: i === gameData.length -1 ? '1px solid lightgray':'unset'
+                                borderBottom: i === gameData.length -1 ? '1px solid smoke':'unset'
                             }}
                             onClick={()=> setSelectedLevel(levelName)}
                             key={game}

@@ -49,7 +49,6 @@ export default function GOLButton({onClick, config, cleanup}) {
         //Initialize Game of Life Engine and attach it to the canvas.
         GOLHandler.current = new GOLEngine(canvas.current, config);
 
-        console.log(GOLHandler.current.TICK_SPEED);
 
         canvas.current.addEventListener('wheel', wheelListener);
         canvas.current.addEventListener('mouseenter',mouseEnter);

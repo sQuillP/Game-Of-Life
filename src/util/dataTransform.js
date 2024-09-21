@@ -77,3 +77,22 @@ export const shiftCells = (cells,xoffset, yoffset)=> {
         return `${x1+xoffset},${y1 + yoffset}`
     })
 }
+
+
+
+export function processCustomText(text) {
+    //Match expression for (x,y) format
+    const matchExpression = /\(\d+,\d+\)/gi;
+
+    //parsed expression, strip the opening
+    const parsedText = text.match(matchExpression)?.map(point => point.substring(1,point.length-1))
+    console.log(parsedText);
+    const liveCells = new Set();
+
+    //add points to a set
+    for(let i = 0; i< parsedText?.length; i++) {
+        liveCells.add(parsedText[i]);
+    }
+
+    return liveCells
+}

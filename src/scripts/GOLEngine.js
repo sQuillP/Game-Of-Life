@@ -66,12 +66,21 @@ export default class GOLEngine {
     }
 
 
+    /**
+     * @description Accept an object of two sets.
+     * @param {liveCells:set<string>}
+     * @param {deadCells:set<string>}
+     */
     loadGame({liveCells, deadCells}) {
         this.liveCells = liveCells;
         this.deadCells = deadCells;
         this.drawGrid();
     }
 
+
+    setInitialCells(initialCells) {
+        this.initialCells = initialCells;
+    }
 
     initializeCells() {
         //clear all live cells

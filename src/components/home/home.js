@@ -24,13 +24,16 @@ export default function Home() {
                     <GOLButton onClick={()=> navigation("/play")} config={PLAY}/>
                     <GOLButton onClick={()=> window.open(wiki)} config={WIKI}/>
                 </div>
-                <div className="icons">
-                    <Tooltip title="View GitHub">
-                        <button onClick={()=>window.open(githubRepo)} className="h-icon">
-                            <i className="fa-brands fa-github"></i>
-                        </button>
-                    </Tooltip>
-                    
+                <div className="home-footer">
+                    <p className="_golversion text silkscreen-regular">V_1.0</p>
+                    <div className="icons">
+                        <Tooltip title="View GitHub">
+                            <button onClick={()=>window.open(githubRepo)} className="h-icon">
+                                <i className="fa-brands fa-github"></i>
+                            </button>
+                        </Tooltip>
+                        
+                    </div>
                 </div>
             </div>
         </div>

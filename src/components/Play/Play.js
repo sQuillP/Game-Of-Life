@@ -11,17 +11,12 @@ import BookmarksIcon from "@mui/icons-material/Bookmarks";
 import Draggable from "react-draggable";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { FileDownload } from "@mui/icons-material";
-
+import PaletteIcon from '@mui/icons-material/Palette';
 
 /*
 
-    - Color picker
-    - zoom buttons
-    - save
-    - load
-    - presets
-    - generation
 
+TODO: Mobile support for pinch gesture.
 
 node.addEventListener('gestureend', function(e) {
     if (e.scale < 1.0) {
@@ -60,7 +55,7 @@ export default function Play() {
     //Trigger modal to open in the child component (GOLPlayer)
     const [openModal, setOpenModal] = useState(false);
 
-    const smallscreen = useMediaQuery('(max-width: 1000px)');
+    const smallscreen = useMediaQuery('(max-width: 1045px)');
 
 
 
@@ -129,24 +124,6 @@ export default function Play() {
                                         <RestartAltIcon/>
                                     </IconButton>
                                 </Tooltip>
-                                {/* <Button
-                                    size="medium"
-                                    variant='contained'
-                                    sx={buttonSX}
-                                    endIcon={<FolderIcon fontSize="small"/>}
-                                >
-                                    Load
-                                </Button> */}
-                                {/* <Select
-                                    size="small"
-                                    value={"None"}
-                                    onChange={handleSelectChange}
-                                    variant="outlined"
-                                    sx={{background:'lightgray'}}
-
-                                >
-                                    <MenuItem hidden value='None'>Presets</MenuItem>
-                                </Select> */}
                                 <Button
                                     endIcon={<FileDownload/>}
                                     size="medium"
@@ -194,18 +171,70 @@ export default function Play() {
                             </div>
                             <div className="smallscreen-footer">
                                 <Stack 
-                                    direction={'column'} 
+                                    direction={'row'} 
                                     justifyContent={'center'} 
                                     alignItems={'center'}
                                     height={'100%'}
+                                    gap={2}
                                 >
-                                    
+                                    <Tooltip title="Reset game">
+                                        <IconButton
+                                            size="small"
+                                            onClick={onResetGame}
+                                            style={{background: 'lightgray', color:'black'}}
+
+                                        >
+                                            <RestartAltIcon/>
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip
+                                        title="Save Game"
+                                    >
+                                        <IconButton
+                                            size="small"
+                                            onClick={onToggleSaveModal}
+                                            style={{background:'lightgray', color:'black'}}
+                                        >
+                                            <BookmarksIcon />
+                                        </IconButton>
+                                    </Tooltip>
                                     <PlayButton
                                         playState={playState}
                                         setPlayState={setPlayState}
                                     />
-
-
+                                    <Tooltip
+                                        title="Palette"
+                                    >
+                                        <div className="play-color-picker">
+                                            <label className="color-picker-label" htmlFor="colorPicker">
+                                                <IconButton
+                                                    disabled
+                                                    size="small"
+                                                    style={{background:'lightgray', color:'black'}}
+                                                >
+                                                    <PaletteIcon/>
+                                                </IconButton>
+                                            </label>
+                                            <input 
+                                                onChange={(e)=>setCellColor(e.target.value)} 
+                                                type="color" 
+                                                value={cellColor}
+                                                id="colorPicker"
+                                                
+                                            />
+                                        </div>
+                                    </Tooltip>
+                                    <Tooltip
+                                        title={'Load Game'}
+                                    >
+                                        <IconButton
+                                            size="small"
+                                            style={{background:'lightgray', color:'black'}}
+                                            onClick={onToggleLoadGameModal}
+                                        >
+                                            <FileDownload/>
+                                        </IconButton>
+                                    </Tooltip>
                                 </Stack>
                             </div>
                         </>

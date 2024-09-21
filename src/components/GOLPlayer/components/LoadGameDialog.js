@@ -21,7 +21,7 @@ import {
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-import { STORAGE_PREFIX_KEY } from "../../../util/dataTransform";
+import { STORAGE_PREFIX_KEY, loadSavedGame, processCustomText } from "../../../util/dataTransform";
 import { useEffect, useState } from "react";
 
 
@@ -37,6 +37,7 @@ const Root = styled('div')(({ theme }) => ({
     '& > :not(style) ~ :not(style)': {
       marginTop: theme.spacing(2),
     },
+    "&:before, &:after":{backgroundColor: 'var(--dark-6)'},
     margin:'0px 0 50px 0'
 }));
   
@@ -69,11 +70,16 @@ export default function LoadGameDialog({
 
     const [tab, setCurretTab] = useState(0);
     const [selectedLevel, setSelectedLevel] = useState(populateSelectedLevel());
-    const [cellTextData, setCellTextData] = useState('');
+    const [cellTextData, setCellTextData] = useState(null);
     const [confirmDeleteMenu, setOpenConfirmDeleteMenu] = useState(false);
     const [customInputError, setCustomInputError] = useState({});
+    const [uploadedFileName, setUploadedFileName] = useState("");
 
 
+    function handleCellTextDataChange(e) {
+        const liveCells = processCustomText(e.target.value);
+        setCellTextData(liveCells);
+    }
 
     const smallscreen = useMediaQuery('(max-width: 480px)')
 
@@ -85,6 +91,11 @@ export default function LoadGameDialog({
         }
         return "";
     } 
+
+    function removeFile() {
+        setCellTextData(null);
+        setUploadedFileName("");
+    }
 
 
     function refreshSavedList() {
@@ -98,17 +109,22 @@ export default function LoadGameDialog({
 
 
     const buttonSX = {
-        textTransform:'unset'
+        textTransform:'unset',
+        color:"white"
     }
 
     function handleOk() {
-
+        if(cellTextData !== null) {
+            console.log('uploading a file', cellTextData);
+            setLoadedGame(cellTextData, false)
+        } else {
+            const savedGame = loadSavedGame(STORAGE_PREFIX_KEY + selectedLevel);
+            setLoadedGame(savedGame, true);
+        }
+        onClose();
     }
     
 
-    function onOpenConfirmDeleteMenu() {
-        setOpenConfirmDeleteMenu(true);
-    }
 
 
 
@@ -121,48 +137,49 @@ export default function LoadGameDialog({
 
     useEffect(()=> {
         if(open === false)  return;
-
         refreshSavedList();
+        removeFile();
     },[open]);
 
 
     async function showFile(e) { 
         e.preventDefault() 
         const reader = new FileReader() 
-        
         reader.onload = async (e) => { 
-  
-           const text = (e.target.result) 
-  
-           console.log(text) 
-  
-           alert(text) 
-  
+            const liveCells = processCustomText(e.target.result) ;
+            setCellTextData(liveCells);
         }; 
-  
-        reader.readAsText(e.target.files[0]) 
-  
+        console.log(e.target.files);
+        setUploadedFileName(e.target.files[0].name)
+        reader.readAsText(e.target.files[0]);
      } 
+
 
 
     return (
         <>
             <Dialog
-                sx={{ '& .MuiDialog-paper': { width: '80%', height: 500 } }}
+                sx={{ '& .MuiDialog-paper': { width: '80%', height: 500 }, "*":{color:'white'} }}
                 // maxWidth="xs"
                 open={open}
                 onClose={onClose}
                 fullWidth
             >
-                <DialogTitle sx={{textAlign:'center', fontFamily:'Silkscreen, sans-serif'}}>
+                <DialogTitle style={{background:'var(--dark-4)'}} sx={{textAlign:'center', fontFamily:'Silkscreen, sans-serif'}}>
                     Load Game
-                    <Tabs variant={smallscreen ? 'scrollable':'standard'}  centered={!smallscreen} value={tab } onChange={(e, value)=>setCurretTab(value)}>
-                        <Tab style={{fontFamily:'Silkscreen, sans-serif'}} label="Saved" />
-                        <Tab style={{fontFamily:'Silkscreen, sans-serif'}} label="Presets"  />
-                        <Tab style={{fontFamily:'Silkscreen, sans-serif'}} label="Custom"/>
+                    <Tabs 
+                        variant={smallscreen ? 'scrollable':'standard'}  
+                        centered={!smallscreen} 
+                        value={tab } 
+                        onChange={(e, value)=>setCurretTab(value)}
+                        TabIndicatorProps={{ sx: { backgroundColor: 'var(--dark-6)'}}}
+                    >
+                        <Tab style={{fontFamily:'Silkscreen, sans-serif', color:'white'}} label="Saved" />
+                        <Tab style={{fontFamily:'Silkscreen, sans-serif', color:'white'}} label="Presets"  />
+                        <Tab style={{fontFamily:'Silkscreen, sans-serif', color:'white'}} label="Custom"/>
                     </Tabs>
                 </DialogTitle>
-                <DialogContent sx={{paddingTop: '0'}} dividers>
+                <DialogContent style={{background:'var(--dark-1)'}} sx={{paddingTop: '0'}} dividers>
                     <Box sx={{width: '100%' }}>
                         {
                             (()=> {
@@ -210,20 +227,25 @@ export default function LoadGameDialog({
                                                 alignItems={'center'}
                                             >
                                                 <div className="lgd-custom-container lgd-file-upload">
-                                                    <p className="text silkscreen-regular">Upload a Custom File</p>
-                                                    <label htmlFor="upload-photo">
+                                                    <p style={{textAlign:'center'}} className="text silkscreen-regular">Upload a Custom File</p>
+                                                    <label htmlFor="upload-textfile">
                                                         <input
                                                             style={{ display: 'none' }}
-                                                            id="upload-photo"
-                                                            name="upload-photo"
+                                                            id="upload-textfile"
+                                                            name="upload-textfile"
                                                             type="file"
                                                             onChange={showFile}
+                                                            accept=".txt"
                                                         />
 
                                                         <Button 
                                                             sx={{
                                                                 marginTop: '15px',
-                                                                fontFamily:'Silkscreen, sans-serif'
+                                                                fontFamily:'Silkscreen, sans-serif',
+                                                                background:'var(--dark-6)',
+                                                                "&:hover": {
+                                                                    background: 'var(--dark-7)'
+                                                                }
                                                             }}  
                                                             variant="contained" 
                                                             component="span"
@@ -232,6 +254,25 @@ export default function LoadGameDialog({
                                                             Choose File
                                                         </Button>
                                                     </label>
+                                                    {
+                                                        uploadedFileName && (
+                                                            <Stack 
+                                                                style={{marginTop: '20px'}} 
+                                                                direction={'row'}
+                                                                alignItems={'center'}
+                                                            >
+                                                                <p style={{color:'white'}} className="text silkscreen-regular">{uploadedFileName}</p>
+                                                                <Tooltip>
+                                                                    <IconButton 
+                                                                        onClick={removeFile}
+                                                                        size="small"
+                                                                    >
+                                                                        <DeleteIcon/>
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </Stack>
+                                                        )
+                                                    }
                                                 </div>
                                                 <Root>
                                                     <Divider textAlign="center">OR</Divider>
@@ -241,11 +282,12 @@ export default function LoadGameDialog({
                                                     <label className="silkscreen-regular" style={{ margin:'10px 0', display: 'inline-block'}} htmlFor="lgd-textfield">Enter custom values in the form <span className="silkscreen-bold">(x,y)</span>.</label>
                                                     <TextField
                                                         id="lgd-textfield"
-                                                        onChange={(e)=> setCellTextData(e.target.value)}
+                                                        onChange={handleCellTextDataChange}
                                                         multiline
                                                         rows={5}
                                                         placeholder="ex: (20,32) (33,2)"
                                                         fullWidth
+                                                        style={{background:"var(--dark-6)"}}
                                                     />
                                                 </div>
                                                 
@@ -258,11 +300,11 @@ export default function LoadGameDialog({
                         }
                     </Box>    
                 </DialogContent>
-                <DialogActions>
-                    <Button autoFocus onClick={onClose}>
+                <DialogActions style={{background:'var(--dark-4)'}}>
+                    <Button sx={buttonSX} autoFocus onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button onClick={handleOk}>Load</Button>
+                    <Button sx={buttonSX} onClick={handleOk}>Load</Button>
                 </DialogActions>
         </Dialog>
       </>

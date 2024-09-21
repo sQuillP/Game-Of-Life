@@ -16,7 +16,8 @@ export default function SaveDialog({
     error,
     onClose,
     onSave,
-    open
+    open,
+    value
 }) {
 
     const buttonSX = {
@@ -27,11 +28,13 @@ export default function SaveDialog({
         <Dialog
                 open={open}
                 onClose={onClose}
+                sx={{"*":{color:'white'}}}
+                fullWidth
             >
-                <DialogTitle>Save Game</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Please provide a name for this simulation.
+                <DialogTitle sx={{background:'var(--dark-4)'}}>Save Game</DialogTitle>
+                <DialogContent sx={{background:'var(--dark-1)'}}>
+                    <DialogContentText paddingTop={'20px'} color={'white'}>
+                        Please provide a name.
                     </DialogContentText>
                     <TextField
                         sx={{color:'black'}}
@@ -46,11 +49,12 @@ export default function SaveDialog({
                         variant="standard"
                         onChange={onChange}
                         error={error}
+                        value={value}
                     />
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{background:'var(--dark-4)'}}>
                     <Button color="error" sx={buttonSX} onClick={onClose}>Cancel</Button>
-                    <Button variant="contained" color="success" sx={buttonSX} onClick={onSave}>Save game</Button>
+                    <Button variant="contained" style={{background:"var(--dark-6)"}} sx={buttonSX} onClick={onSave}>Save</Button>
                 </DialogActions>
             </Dialog>
     )
