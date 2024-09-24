@@ -45,10 +45,8 @@ export default function SaveDialog({
                         name="name"
                         className="save-input"
                         label={error ? "Invalid Name":"Name"}
-                        fullWidth
                         variant="standard"
                         onChange={onChange}
-                        error={error}
                         value={value}
                         style={{background:'var(--dark-6)'}}
                     />

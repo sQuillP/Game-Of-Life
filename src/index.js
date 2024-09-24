@@ -14,6 +14,14 @@ import Play from './components/Play/Play';
 
 
 
+/**
+ * TODO: 
+ * 
+ * Fix some pausing bugs with opening menus
+ * maybe pinch/scrolling integration.
+ */
+
+
 const router = createBrowserRouter([
   {
     path:'/home',

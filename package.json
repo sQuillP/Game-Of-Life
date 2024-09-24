@@ -22,7 +22,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "sync":"aws s3 sync ./build s3://game-of-life.website",
+    "invalidate":"aws cloudfront create-invalidation --distribution-id E3L4Y9CRRT1YEG --paths \"/*\""
+
   },
   "eslintConfig": {
     "extends": [
